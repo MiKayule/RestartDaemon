@@ -14,6 +14,14 @@ HelpMessage = '''------MCDR Quick Reboot------
 !!restart start 启动重启服务器的10秒倒计时，需要服务器助理权限
 !!restart abort 中止服务器重启操作，需要服务器用户权限'''
 
+def restart_d_perm(server, info, perm):
+    if info.is_player and server.get_permission_level >= perm:
+        return True
+    elif info.source == 1:
+        return True
+    else:
+        return False
+
 def restart_d_restart(server, info):
     global abort
     global running
@@ -49,35 +57,23 @@ def restart_d_abort(server, info):
     abort = True
 
 def on_info(server, info):
-    if info.content == '!!restart start' and info.is_player:
-        if server.get_permission_level(info.player) >= permissionLevel:
+    if info.content == '!!restart' and info.is_user:
+        server.reply(info, HelpMessage)
+
+    elif info.content == '!!restart start' and info.is_user:
+        if restart_d_perm(server, info, permissionLevel):
             restart_d_restart(server, info)
         else:
-            server.tell(info.player, '权限不足！')
+            server.reply(info, '权限不足！')
 
-    if info.content == '!!restart':
-        if info.is_player:
-            server.tell(info.player, HelpMessage)
-        elif not info.is_player and info.source == 1:
-            server.logger.info("\n" + HelpMessage)
-
-    elif not info.is_player and info.source == 1:
-        if info.content == '!!restart start':
-            restart_d_restart(server, info)
-        elif info.content == '!!restart abort':
-            if running:
-                restart_d_abort(server, info)
-            else:
-                server.logger.info('重启操作未运行')
-
-    elif info.content == '!!restart abort' and info.is_player:
+    elif info.content == '!!restart abort' and info.is_user:
         if running:
-            if server.get_permission_level(info.player) >= permissionLevelAbort:
+            if restart_d_perm(server, info, permissionLevelAbort):
                 restart_d_abort(server, info)
             else:
-                server.tell(info.player, '权限不足！')
+                server.reply(info, '权限不足！')
         else:
-            server.tell(info.player, '重启操作未运行')
+            server.reply(info, '重启操作未运行')
 
 def on_unload(server):
     if running:
@@ -90,4 +86,4 @@ def on_mcdr_stop(server):
         abort = True
 
 def on_load(server, old_module):
-    server.add_help_message('!!restart', '快速、可控地重启服务器')
+    server.add_help_message('!!restart', '便捷、可控地重启服务器')
