@@ -8,6 +8,15 @@ permissionLevelAbort = 1
 abort = False
 running = False
 
+PLUGIN_METADATA = {
+    'id': 'restart_daemon',
+    'version': '1.0.0',
+	'author': 'MiKayule',
+	'description': 'Restart the Minecraft server',
+	'link': 'https://github.com/MiKayule/RestartDaemon',
+    'name': 'RestartDaemon'
+}
+
 HelpMessage = '''------MCDR Quick Reboot------
 一个简易的服务器可控快速重启插件
 使用方法：
@@ -86,4 +95,4 @@ def on_mcdr_stop(server):
         abort = True
 
 def on_load(server, old_module):
-    server.add_help_message('!!restart', '便捷、可控地重启服务器')
+    server.register_help_message('!!restart', '便捷、可控地重启服务器')
